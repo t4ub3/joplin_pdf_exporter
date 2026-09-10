@@ -1,0 +1,16 @@
+{
+	"manifest_version": 1,
+	"id": "com.jonasneumann.joplin-pdf-exporter",
+	"app_min_version": "3.7",
+	"version": "1.0.0",
+	"name": "PDF Exporter",
+	"description": "Set up page breaks, page format, margins, header and footer to export your notes to clean pdfs.",
+	"author": "Jonas Neumann",
+	"homepage_url": "https://github.com/t4ub3/joplin-pdf-exporter",
+	"repository_url": "https://github.com/t4ub3/joplin-pdf-exporter",
+	"keywords": [],
+	"categories": [],
+	"screenshots": [],
+	"icons": {},
+	"promo_tile": {}
+}
