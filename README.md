@@ -18,6 +18,12 @@ This is a plugin for [Joplin](https://joplinapp.org/), an open source note-takin
 
 ## how to use
 
+##### add page breaks
+
+add `///pagebreak` anywhere in your document to add a manual page break.
+
+##### export pdf
+
 Click the pdf icon on the toolbar to open the PDF Exporters side panel. Set the values as you like and click `Export PDF ...` button.
 
 ![Usage screenshot](/src/assets/pdf-exporter-usage.png)
