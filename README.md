@@ -27,3 +27,7 @@ add `///pagebreak` anywhere in your document to add a manual page break.
 Click the pdf icon on the toolbar to open the PDF Exporters side panel. Set the values as you like and click `Export PDF ...` button.
 
 ![Usage screenshot](/src/assets/pdf-exporter-usage.png)
+
+## disclaimer
+
+this plugin was created with heavy use of ai
