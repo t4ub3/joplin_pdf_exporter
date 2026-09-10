@@ -1,5 +1,23 @@
-# Joplin Plugin
+# PDF Exporter
 
-This is your new Joplin plugin. It is suggested that you use this README file to document your plugin.
+This is a plugin for [Joplin](https://joplinapp.org/), an open source note-taking app. With this plugin, you can:
 
-For information on how to build or publish the plugin, please see [GENERATOR_DOC.md](./GENERATOR_DOC.md)
+- export a note to pdf
+- insert manual page breaks
+- set paper format, margins, automatic page breaks
+- create header and footer (manually and with placeholders)
+
+## installation
+
+0. install Joplin
+1. download the .jpl-file from `joplin_pdf_exporter/publish`
+2. In the joplin App, go to `tools/options/plugins`
+3. click the gear icon next to "manage your plugins" and select `install from file`
+4. choose the downloaded .jpl-file
+5. restart joplin, the plugin should be listed on `tools/options/plugins`
+
+## how to use
+
+Click the pdf icon on the toolbar to open the PDF Exporters side panel. Set the values as you like and click `Export PDF ...` button.
+
+![Usage screenshot](/src/assets/pdf-exporter-usage.png)
