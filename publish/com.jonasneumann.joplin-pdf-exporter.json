@@ -12,5 +12,7 @@
 	"categories": [],
 	"screenshots": [],
 	"icons": {},
-	"promo_tile": {}
+	"promo_tile": {},
+	"_publish_hash": "sha256:34ba3a0ebc8de82d076bec99f9843c0f6788c0ce55201dc81a35d87350dc850a",
+	"_publish_commit": "main:abda57761ff1fb8a772d110444086cb1f4b09c99"
 }
