@@ -70,8 +70,15 @@ export function panelHtml(): string {
 					</label>
 				</div>
 
-				<button type="button" id="jpe-export">Export PDF…</button>
+				<div class="jpe-actions">
+					<button type="button" id="jpe-export">Export PDF…</button>
+					<button type="button" id="jpe-preview" class="jpe-secondary">Preview PDF</button>
+				</div>
 				<div class="jpe-status" id="jpe-status"></div>
+
+				<div id="jpe-preview-frame">
+					<embed id="jpe-preview-embed" type="application/pdf">
+				</div>
 			</form>
 		</div>
 	`;

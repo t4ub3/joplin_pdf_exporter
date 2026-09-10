@@ -1,8 +1,11 @@
 // -----------------------------------------------------------------------------
-// The panel is settings UI only - it never renders or prints a note itself.
-// The Export button just tells the plugin script (index.ts) to run, which
-// hands off to Joplin's own "Export as PDF" command; the pagination CSS is
-// contributed separately, by contentScript/pageBreakMarker.ts.
+// The panel is settings UI (plus an optional preview) - it never renders or
+// prints a note itself. Export and Preview both just tell the plugin script
+// (index.ts) to run, which hands off to Joplin's own "Export as PDF" command;
+// the pagination CSS is contributed separately, by
+// contentScript/pageBreakMarker.ts. Preview additionally asks the user to
+// point at the file they just saved (index.ts has the full explanation) and
+// displays it inline via Chromium's built-in PDF viewer.
 // -----------------------------------------------------------------------------
 
 import { ExportSettings, sanitiseSettings } from '../common/types';
@@ -10,7 +13,8 @@ import { ExportSettings, sanitiseSettings } from '../common/types';
 const el = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 
 let currentSettings: ExportSettings = sanitiseSettings({});
-let exporting = false;
+// Shared by export and preview: both open native dialogs, so only one may run at a time.
+let busy = false;
 
 function readForm(): ExportSettings {
 	const levels: number[] = [];
@@ -58,10 +62,15 @@ function setStatus(message: string, kind: 'info' | 'error' = 'info'): void {
 	status.className = kind === 'error' ? 'jpe-status jpe-status--error' : 'jpe-status';
 }
 
+function setButtonsDisabled(disabled: boolean): void {
+	el<HTMLButtonElement>('jpe-export').disabled = disabled;
+	el<HTMLButtonElement>('jpe-preview').disabled = disabled;
+}
+
 async function exportPdf(): Promise<void> {
-	if (exporting) return;
-	exporting = true;
-	el<HTMLButtonElement>('jpe-export').disabled = true;
+	if (busy) return;
+	busy = true;
+	setButtonsDisabled(true);
 	setStatus('Opening the export dialog…');
 
 	try {
@@ -71,8 +80,31 @@ async function exportPdf(): Promise<void> {
 	} catch (error) {
 		setStatus(`Export failed: ${error instanceof Error ? error.message : String(error)}`, 'error');
 	} finally {
-		exporting = false;
-		el<HTMLButtonElement>('jpe-export').disabled = false;
+		busy = false;
+		setButtonsDisabled(false);
+	}
+}
+
+async function previewPdf(): Promise<void> {
+	if (busy) return;
+	busy = true;
+	setButtonsDisabled(true);
+	setStatus('Save the PDF, then select it again to preview it here…');
+
+	try {
+		const result = await webviewApi.postMessage({ type: 'preview' });
+		if (result && result.ok && result.dataUri) {
+			el<HTMLEmbedElement>('jpe-preview-embed').src = result.dataUri;
+			el('jpe-preview-frame').style.display = 'block';
+			setStatus('');
+		} else {
+			setStatus((result && result.message) || 'Preview failed.', 'error');
+		}
+	} catch (error) {
+		setStatus(`Preview failed: ${error instanceof Error ? error.message : String(error)}`, 'error');
+	} finally {
+		busy = false;
+		setButtonsDisabled(false);
 	}
 }
 
@@ -88,6 +120,7 @@ async function main(): Promise<void> {
 	el('jpe-form').addEventListener('change', onFormChanged);
 	el('jpe-form').addEventListener('input', onFormChanged);
 	el('jpe-export').addEventListener('click', () => { void exportPdf(); });
+	el('jpe-preview').addEventListener('click', () => { void previewPdf(); });
 
 	setStatus('');
 }

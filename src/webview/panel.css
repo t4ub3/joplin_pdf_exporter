@@ -80,8 +80,14 @@
 	margin-bottom: 12px;
 }
 
-#jpe-export {
-	width: 100%;
+.jpe-actions {
+	display: flex;
+	gap: 8px;
+}
+
+#jpe-export,
+#jpe-preview {
+	flex: 1;
 	padding: 8px 10px;
 	font-size: 1em;
 	font-weight: 600;
@@ -92,11 +98,17 @@
 	color: var(--joplin-color, #222);
 }
 
-#jpe-export:hover:not(:disabled) {
+#jpe-preview.jpe-secondary {
+	background: transparent;
+}
+
+#jpe-export:hover:not(:disabled),
+#jpe-preview:hover:not(:disabled) {
 	filter: brightness(0.96);
 }
 
-#jpe-export:disabled {
+#jpe-export:disabled,
+#jpe-preview:disabled {
 	opacity: 0.6;
 	cursor: default;
 }
@@ -112,4 +124,20 @@
 .jpe-status--error {
 	color: var(--joplin-color-error, #c33);
 	opacity: 1;
+}
+
+/* Hidden until the first successful preview; panel.ts reveals it. */
+#jpe-preview-frame {
+	display: none;
+	margin-top: 8px;
+	border: 1px solid var(--joplin-divider-color, #ccc);
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+#jpe-preview-embed {
+	display: block;
+	width: 100%;
+	height: 70vh;
+	border: 0;
 }
