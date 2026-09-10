@@ -1,7 +1,7 @@
 import { ExportSettings } from './types';
 
 export interface PrintContext {
-	/** Note title, for the {title} placeholder and the injected title heading. */
+	/** Note title, for the {title} placeholder in header/footer text. */
 	title: string;
 	/** Localised date, for the {date} placeholder. */
 	date: string;
@@ -110,30 +110,20 @@ export function buildPrintCss(settings: ExportSettings, context: PrintContext): 
 	}
 ${headingRule}
 
-	/* Never start the document with a blank page: a heading (or our own
-	   injected title) that opens the document keeps its break suppressed,
-	   regardless of the breakBeforeHeadings selection above. */
-	h1:first-child,
-	h2:first-child,
-	h3:first-child,
-	h4:first-child,
-	h5:first-child,
-	h6:first-child,
-	.jpe-note-title:first-child {
+	/* Never start the document with a blank page: a heading that opens the
+	   document keeps its break suppressed, regardless of the
+	   breakBeforeHeadings selection above. Joplin's own exporter (unrelated to
+	   this plugin) unconditionally prepends the note title as ".exported-note-title"
+	   before our rendered content, so a heading can either be the literal
+	   first child (title off) or the element right after the title (title on)
+	   - both need the same guard. */
+	h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, h6:first-child,
+	.exported-note-title + h1, .exported-note-title + h2, .exported-note-title + h3,
+	.exported-note-title + h4, .exported-note-title + h5, .exported-note-title + h6 {
 		break-before: avoid !important;
 	}
 
-	/* The injected note title only exists to appear in print; the live note
-	   viewer already shows the title in Joplin's own UI. */
-	.jpe-note-title {
-		display: none;
-	}
-
 	@media print {
-		.jpe-note-title {
-			display: block;
-		}
-
 		/* The page-break markers are editor decoration only. */
 		.jpe-page-marker {
 			display: none !important;

@@ -7,9 +7,12 @@
 // to (a) recognise the ///pagebreak marker and (b) inject the pagination CSS
 // built from the plugin's settings into every render.
 //
-// Everything this script adds that would otherwise be visible in the normal
-// note viewer (the title heading) is hidden by default and only revealed
-// under `@media print`, in printCss.ts - see the comment on buildPrintCss().
+// The "note title" setting doesn't add any markup of its own: Joplin's own
+// exporter (InteropService_Exporter_Html) already prepends the note's title
+// unconditionally on every export, and the only way to suppress that is the
+// `<!-- joplin-metadata-print-title = false -->` comment it specifically
+// looks for in the rendered HTML (see parseRenderedNoteMetadata in Joplin's
+// source) - so that's what gets emitted here when the setting is off.
 // -----------------------------------------------------------------------------
 
 import { CONTEXT_KEY, PAGE_BREAK_TOKEN, SETTINGS_KEY, parseJsonSetting, sanitiseContext, sanitiseSettings } from '../common/types';
@@ -36,14 +39,6 @@ function htmlBlockToken(html: string): any {
 	};
 }
 
-function escapeHtml(value: string): string {
-	return value
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;');
-}
-
 export default function pageBreakMarker() {
 	return {
 		plugin: function(markdownIt: any, ruleOptions: any) {
@@ -68,13 +63,19 @@ export default function pageBreakMarker() {
 			});
 
 			markdownIt.renderer.rules.jpe_page_break = () => {
-				// jpe-page-break drives pagination (print only); jpe-page-marker is
-				// the dashed divider shown while editing, hidden again in print.
-				return '<div class="jpe-page-break jpe-page-marker" aria-label="Page break"><span>page break</span></div>\n';
+				// jpe-page-break is the element that actually breaks the page - it
+				// must stay a normal, always-rendered block. jpe-page-marker (the
+				// dashed divider shown while editing) is a separate, nested element
+				// specifically so that hiding it in print (display:none) never also
+				// removes the outer element from the render tree: a display:none
+				// element takes no part in CSS fragmentation, so break-after would
+				// silently do nothing if both classes were on the same element.
+				return '<div class="jpe-page-break"><div class="jpe-page-marker" aria-label="Page break"><span>page break</span></div></div>\n';
 			};
 
 			// Reads the plugin's settings fresh on every render and injects the
-			// note title heading (print-only) and the pagination stylesheet.
+			// pagination stylesheet, plus the title-suppression comment when the
+			// "note title" setting is off.
 			markdownIt.core.ruler.push('jpe_finalize', (state: any) => {
 				// Some content scripts (e.g. HTML Blocks' `table` mode) render a
 				// cell's markdown via markdownIt.renderInline(), which re-enters the
@@ -93,9 +94,8 @@ export default function pageBreakMarker() {
 				const settings = parseJsonSetting(settingValue(SETTINGS_KEY), sanitiseSettings);
 				const context = parseJsonSetting(settingValue(CONTEXT_KEY), sanitiseContext);
 
-				if (settings.includeTitle && context.title) {
-					const titleHtml = `<h1 class="jpe-note-title">${escapeHtml(context.title)}</h1>\n`;
-					state.tokens.unshift(htmlBlockToken(titleHtml));
+				if (!settings.includeTitle) {
+					state.tokens.unshift(htmlBlockToken('<!-- joplin-metadata-print-title = false -->\n'));
 				}
 
 				const styleHtml = `<style>${buildPrintCss(settings, context)}</style>\n`;

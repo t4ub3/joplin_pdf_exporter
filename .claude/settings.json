@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(pwd -W)",
+      "Read(//c/Users/JonasNeumann/AppData/Local/Temp/joplin-src/packages/lib/services/plugins/utils/**)",
+      "Read(//c/Users/JonasNeumann/AppData/Local/Temp/joplin-src/packages/renderer/**)",
+      "Read(//c/Users/JonasNeumann/AppData/Local/Temp/joplin-src/packages/app-desktop/**)",
+      "Read(//c/Users/JonasNeumann/AppData/Local/Temp/joplin-src/packages/lib/services/interop/**)"
+    ]
+  }
+}
